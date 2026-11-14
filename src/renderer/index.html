@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hymn</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="titlebar">
+      <div class="brand"><span class="logo" data-icon="logo"></span><span>Hymn</span></div>
+      <div class="titlebar-buttons">
+        <button class="icon-button toggle" id="pin" data-icon="pin" title="Keep on top of other windows" aria-pressed="true"></button>
+        <button class="icon-button" id="swap-side" data-icon="swap" title="Move to the other side"></button>
+        <button class="icon-button" id="open-settings" data-icon="settings" title="Settings (⌘,)"></button>
+        <button class="icon-button" id="hide" data-icon="hide" title="Hide the sidebar"></button>
+      </div>
+    </header>
+
+    <section class="player" aria-label="Player">
+      <div class="video">
+        <div id="video-host" class="video-host"></div>
+        <div class="video-empty" id="video-empty">
+          <span class="video-empty-logo" data-icon="logo"></span>
+          <p id="video-empty-text">Loading YouTube's player…</p>
+        </div>
+      </div>
+      <div class="now">
+        <div class="now-text">
+          <div class="now-title" id="now-title">Nothing playing</div>
+          <div class="now-channel" id="now-channel">&nbsp;</div>
+        </div>
+        <button class="icon-button" id="open-youtube" data-icon="external" title="Open on YouTube" disabled></button>
+      </div>
+      <div class="progress">
+        <span class="time" id="elapsed">0:00</span>
+        <input type="range" class="slider" id="seek" min="0" max="1000" step="1" value="0" aria-label="Position" disabled>
+        <span class="time" id="duration">0:00</span>
+      </div>
+      <div class="controls">
+        <button class="icon-button toggle" id="shuffle" data-icon="shuffle" title="Shuffle (S)" aria-pressed="false"></button>
+        <button class="icon-button big" id="previous" data-icon="previous" title="Previous (P)"></button>
+        <button class="play-button" id="play" data-icon="play" title="Play (Space)" aria-label="Play"></button>
+        <button class="icon-button big" id="next" data-icon="next" title="Next (N)"></button>
+        <button class="icon-button toggle" id="repeat" data-icon="repeat" title="Repeat: all (R)" data-mode="all" aria-pressed="true"></button>
+      </div>
+      <div class="volume">
+        <button class="icon-button" id="mute" data-icon="volume" title="Mute (M)"></button>
+        <input type="range" class="slider" id="volume" min="0" max="100" step="1" value="70" aria-label="Volume">
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist" aria-label="Sources">
+      <button role="tab" class="tab" data-tab="playlist" id="tab-playlist" aria-controls="panel-playlist"><span data-icon="playlist"></span>Playlist</button>
+      <button role="tab" class="tab" data-tab="radio" id="tab-radio" aria-controls="panel-radio"><span data-icon="radio"></span>Radio</button>
+      <button role="tab" class="tab" data-tab="search" id="tab-search" aria-controls="panel-search"><span data-icon="search"></span>Search</button>
+      <button role="tab" class="tab" data-tab="queue" id="tab-queue" aria-controls="panel-queue"><span data-icon="queue"></span>Queue<span class="badge" id="queue-count" hidden></span></button>
+    </nav>
+
+    <main class="panels">
+      <section class="panel" id="panel-playlist" role="tabpanel" aria-labelledby="tab-playlist">
+        <div class="panel-head">
+          <div class="panel-heading">
+            <h2 id="playlist-title">Your playlist</h2>
+            <p class="meta" id="playlist-meta">Loading…</p>
+          </div>
+          <button class="icon-button" id="playlist-refresh" data-icon="refresh" title="Reload from YouTube"></button>
+          <button class="pill" id="playlist-play"><span data-icon="play"></span>Play</button>
+        </div>
+        <form class="setup" id="playlist-setup" hidden>
+          <p>Which YouTube playlist should Hymn play? Paste a link to one: yours or anyone's, public or unlisted.</p>
+          <div class="inline">
+            <input class="field" id="playlist-setup-input" placeholder="https://www.youtube.com/playlist?list=…" aria-label="Link to a YouTube playlist" autocomplete="off" spellcheck="false">
+            <button class="pill" type="submit">Load</button>
+          </div>
+          <p class="hint" id="playlist-setup-hint">You can change it later in Settings. Radio and Search work without one.</p>
+        </form>
+        <input type="search" class="field" id="playlist-filter" placeholder="Filter" aria-label="Filter the playlist" autocomplete="off" spellcheck="false">
+        <ul class="list" id="playlist-list" aria-label="Playlist"></ul>
+        <p class="empty" id="playlist-empty" hidden></p>
+      </section>
+
+      <section class="panel" id="panel-radio" role="tabpanel" aria-labelledby="tab-radio" hidden>
+        <div class="cards">
+          <button class="card" id="radio-current">
+            <span class="card-icon" data-icon="radio"></span>
+            <strong>Radio from this song</strong>
+            <small id="radio-current-hint">YouTube's mix for what's playing</small>
+          </button>
+          <button class="card" id="radio-discover">
+            <span class="card-icon" data-icon="sparkles"></span>
+            <strong>Discover</strong>
+            <small>Like your playlist, but nothing that's in it</small>
+          </button>
+        </div>
+        <div class="panel-head">
+          <div class="panel-heading">
+            <h2 id="radio-title">No radio playing</h2>
+            <p class="meta" id="radio-meta">It keeps going: more songs come as it plays.</p>
+          </div>
+        </div>
+        <ul class="list" id="radio-list" aria-label="Radio"></ul>
+      </section>
+
+      <section class="panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
+        <form class="search-form" id="search-form" role="search">
+          <span data-icon="search"></span>
+          <input type="search" class="field" id="search-input" placeholder="Search YouTube or paste a link" aria-label="Search YouTube or paste a link" autocomplete="off" spellcheck="false">
+        </form>
+        <div class="panel-head" id="search-head" hidden>
+          <div class="panel-heading">
+            <h2 id="search-title">Results</h2>
+            <p class="meta" id="search-meta"></p>
+          </div>
+          <button class="pill" id="search-play-all"><span data-icon="play"></span>Play all</button>
+        </div>
+        <ul class="list" id="search-list" aria-label="Search results"></ul>
+        <p class="empty" id="search-empty">Find any song on YouTube, or paste a link to a video or a playlist. A song you pick keeps going as a radio.</p>
+      </section>
+
+      <section class="panel" id="panel-queue" role="tabpanel" aria-labelledby="tab-queue" hidden>
+        <div class="panel-head">
+          <div class="panel-heading">
+            <h2>Up next</h2>
+            <p class="meta" id="queue-meta">Songs you add with + play first.</p>
+          </div>
+          <button class="pill subtle" id="queue-clear" hidden>Clear</button>
+        </div>
+        <ul class="list" id="queue-list" aria-label="Up next"></ul>
+        <div class="panel-head">
+          <div class="panel-heading">
+            <h2 id="queue-context-title">Then</h2>
+            <p class="meta" id="queue-context-meta"></p>
+          </div>
+        </div>
+        <ul class="list" id="queue-context-list" aria-label="Then"></ul>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+      <span id="toast-text"></span>
+      <button class="toast-action" id="toast-action" hidden></button>
+    </div>
+
+    <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+      <div class="sheet-head">
+        <h2 id="settings-title">Settings</h2>
+        <button class="icon-button" id="settings-close" data-icon="close" title="Close (Esc)"></button>
+      </div>
+      <div class="sheet-body">
+        <form class="setting" id="playlist-form">
+          <label for="setting-playlist">Your playlist</label>
+          <div class="inline">
+            <input class="field" id="setting-playlist" placeholder="Link or ID of a YouTube playlist" autocomplete="off" spellcheck="false">
+            <button class="pill" type="submit">Load</button>
+          </div>
+          <p class="hint" id="setting-playlist-hint">A public or unlisted playlist.</p>
+        </form>
+
+        <div class="setting">
+          <span class="label">Side</span>
+          <div class="segmented" role="radiogroup" aria-label="Side">
+            <button type="button" role="radio" data-side="left">Left</button>
+            <button type="button" role="radio" data-side="right">Right</button>
+          </div>
+        </div>
+        <div class="setting">
+          <label for="setting-width">Width</label>
+          <input type="range" class="slider" id="setting-width" min="380" max="600" step="10">
+        </div>
+
+        <label class="switch"><input type="checkbox" id="setting-alwaysOnTop"><span>Keep on top of other windows</span></label>
+        <label class="switch"><input type="checkbox" id="setting-autoHide"><span>Hide when the mouse leaves, show again at the screen edge</span></label>
+        <label class="switch"><input type="checkbox" id="setting-allSpaces"><span>Show on every desktop (Space)</span></label>
+        <label class="switch"><input type="checkbox" id="setting-menuBarTitle"><span>Show the song in the menu bar</span></label>
+        <label class="switch"><input type="checkbox" id="setting-openAtLogin"><span>Open at login</span></label>
+        <p class="hint" id="login-hint" hidden>Available in the installed app (Hymn.app).</p>
+
+        <h3>Global shortcuts</h3>
+        <div class="shortcuts" id="shortcut-list"></div>
+        <p class="hint">They work while other apps are in front. Click one and press the keys you want; Delete turns it off. The media keys (⏮ ⏯ ⏭) work too while Hymn is what's playing.</p>
+
+        <h3>Videos that won't play</h3>
+        <div class="inline">
+          <p class="hint grow" id="blocked-hint">None so far.</p>
+          <button class="pill subtle" type="button" id="blocked-clear" hidden>Try again</button>
+        </div>
+
+        <p class="about" id="about"></p>
+        <button class="pill subtle danger" type="button" id="quit">Quit Hymn</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

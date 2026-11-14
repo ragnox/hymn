@@ -1,0 +1,2 @@
+html, body, #host, #host > div, #host iframe { width: 100%; height: 100%; margin: 0; border: 0; display: block; }
+html, body { background: #000; overflow: hidden; }
